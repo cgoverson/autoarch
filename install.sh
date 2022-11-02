@@ -25,6 +25,8 @@ device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) 
 clear
 
 read -p 'Hostname for new installation: ' myhostname
+read -p 'Username for new installation: ' myusername
+read -p 'Password for new installation: ' mypassword
 
 # Calculate partition table
 totalRam=$(grep MemTotal /proc/meminfo | sed 's/[^0-9]*//g')
@@ -60,14 +62,14 @@ w" | fdisk $device
 #mkfs.fat -I -F 32 /dev/sda1
 #mkswap -f /dev/sda2
 
-mkfs.fat -F 32 /dev/sda1
-mkswap /dev/sda2
-mkfs.ext4 /dev/sda3
+mkfs.fat -F 32 ${device}1
+mkswap ${device}2
+mkfs.ext4 ${device}3
 
-mount /dev/sda3 /mnt
+mount ${device}3 /mnt
 mkdir /mnt/boot
-mount /dev/sda1 /mnt/boot
-swapon /dev/sda2
+mount ${device}1 /mnt/boot
+swapon ${device}2
 
 pacstrap /mnt base base-devel
 
@@ -81,14 +83,30 @@ ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 hwclock --systohc
 echo -e 'en_US.UTF-8 UTF-8' > /etc/locale.gen
 locale-gen
-pacman -Syu --noconfirm intel-ucode networkmanager python nano sudo 
+pacman -Syu --noconfirm intel-ucode networkmanager python nano 
 bootctl install
+echo 'default arch.conf' > /boot/loader/loader.conf
+echo 'editor  no' >> /boot/loader/loader.conf
+rm -rf /boot/loader/entries/*
+echo 'title Arch Linux' > /boot/loader/entries/arch.conf
+echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
+echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
+echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
+useradd -m -g wheel -G audio ${myusername}
+echo -e ${mypasswd} | passwd ${myusername} --stdin
+passwd --lock root
 
 
 " | arch-chroot /mnt
 
+mypartuuid=$(blkid -s PARTUUID -o value ${device})
+echo "options root=PARTUUID=${mypartuuid} rw" >> /boot/loader/entries/arch.conf
 echo ${myhostname} > /mnt/etc/hostname
+
+
+
+
 
 echo -e "
 
-" > /mnt/firstboot.sh
+" > /mnt/home/${myusername}/firstboot.sh
