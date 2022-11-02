@@ -62,6 +62,7 @@ w" | fdisk $device
 #mkfs.fat -I -F 32 /dev/sda1
 #mkswap -f /dev/sda2
 
+# For some reason mkfs doesn't like using variable names for devices, so temp.sh is created
 echo "mkfs.fat -F 32 ${device}1" > temp.sh
 echo "mkswap ${device}2" >> temp.sh
 echo "mkfs.ext4 ${device}3" >> temp.sh
