@@ -81,7 +81,7 @@ ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 hwclock --systohc
 echo -e 'en_US.UTF-8 UTF-8' > /etc/locale.gen
 locale-gen
-pacman -Syu intel-ucode networkmanager python nano sudo 
+pacman -Syu --noconfirm intel-ucode networkmanager python nano sudo 
 bootctl install
 
 
