@@ -62,14 +62,16 @@ w" | fdisk $device
 #mkfs.fat -I -F 32 /dev/sda1
 #mkswap -f /dev/sda2
 
-mkfs.fat -F 32 ${device}1
-mkswap ${device}2
-mkfs.ext4 ${device}3
-
-mount ${device}3 /mnt
-mkdir /mnt/boot
-mount ${device}1 /mnt/boot
-swapon ${device}2
+echo "mkfs.fat -F 32 ${device}1" > temp.sh
+echo "mkswap ${device}2" >> temp.sh
+echo "mkfs.ext4 ${device}3" >> temp.sh
+echo "mount ${device}3 /mnt" >> temp.sh
+echo "mkdir /mnt/boot" >> temp.sh
+echo "mount ${device}1 /mnt/boot" >> temp.sh
+echo "swapon ${device}2" >> temp.sh
+chmod 777 temp.sh
+./temp.sh
+rm temp.sh
 
 pacstrap /mnt base base-devel
 
