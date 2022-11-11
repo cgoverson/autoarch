@@ -80,8 +80,10 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 cp /etc/pacman.d/mirrorlist.old /mnt/etc/pacman.d/mirrorlist.old
 
-echo -e "
 
+
+
+echo -e "
 ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 hwclock --systohc
 echo -e 'en_US.UTF-8 UTF-8' > /etc/locale.gen
@@ -98,8 +100,13 @@ echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 useradd -m -g wheel -G audio ${myusername}
 echo -e ${mypasswd} | passwd ${myusername} --stdin
 passwd --lock root
+" > /mnt/root/temp.sh
 
+echo -e "
 
+chmod 777 /root/temp.sh
+/root/temp.sh
+rm /root/temp.sh
 " | arch-chroot /mnt
 
 mypartuuid=$(blkid -s PARTUUID -o value ${device})
