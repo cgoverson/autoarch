@@ -37,21 +37,17 @@ offset=$(($totalDisk-$totalRam))
 echo -e "g
 n
 1
-
 +300M
 t
 1
 n
 2
-
 +${totalRam}K
 t
 2
 19
 n
 3
-
-
 t
 3
 23
@@ -80,9 +76,6 @@ genfstab -U /mnt >> /mnt/etc/fstab
 
 cp /etc/pacman.d/mirrorlist.old /mnt/etc/pacman.d/mirrorlist.old
 
-
-
-
 echo -e "
 ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 hwclock --systohc
@@ -98,15 +91,8 @@ echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
 echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 useradd -m -g wheel -G audio ${myusername}
-echo -e ${mypasswd} | passwd ${myusername} --stdin
+echo -e ${mypassword} | passwd ${myusername} --stdin
 passwd --lock root
-" > /mnt/root/temp.sh
-
-echo -e "
-
-chmod 777 /root/temp.sh
-/root/temp.sh
-rm /root/temp.sh
 " | arch-chroot /mnt
 
 mypartuuid=$(blkid -s PARTUUID -o value ${device})
@@ -118,5 +104,4 @@ echo ${myhostname} > /mnt/etc/hostname
 
 
 echo -e "
-
 " > /mnt/home/${myusername}/firstboot.sh
