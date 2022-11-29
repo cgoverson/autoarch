@@ -10,8 +10,7 @@ timedatectl set-ntp true
 
 mv /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.old
 
-echo 'Server = https://mirror.arizona.edu/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
-echo 'Server = https://plug-mirror.rcac.purdue.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
+echo 'Server = https://plug-mirror.rcac.purdue.edu/archlinux/$repo/os/$arch' > /etc/pacman.d/mirrorlist
 echo 'Server = https://mirror.clarkson.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
 echo 'Server = https://mirrors.rit.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
 echo 'Server = https://mirror.umd.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
@@ -74,8 +73,6 @@ rm temp.sh
 pacstrap /mnt base base-devel
 
 genfstab -U /mnt >> /mnt/etc/fstab
-
-cp /etc/pacman.d/mirrorlist.old /mnt/etc/pacman.d/mirrorlist.old
 
 echo -e "
 ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
