@@ -39,26 +39,25 @@ offset=$(($totalDisk-$totalRam))
 echo -e "g
 n
 1
+
 +300M
 t
 1
 n
 2
+
 +${totalRam}K
 t
 2
 19
 n
 3
+
+
 t
 3
 23
 w" | fdisk $device
-
-# TODO is there a need to ignore errors & force execution?
-#mkfs.ext4 -F /dev/sda3
-#mkfs.fat -I -F 32 /dev/sda1
-#mkswap -f /dev/sda2
 
 # For some reason mkfs doesn't like using variable names for devices, so temp.sh is created
 echo "mkfs.fat -F 32 ${device}1" > temp.sh
