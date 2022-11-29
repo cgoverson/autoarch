@@ -17,14 +17,9 @@ echo 'Server = https://mirror.umd.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d
 echo 'Server = https://mirrors.mit.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
 echo 'Server = https://mirrors.bloomu.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
 
-#pacman-key --init
-pacman -Sy
-pacman --noconfirm -S dialog
+lsblk -dplnx size -o name,size
 
-devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac) 
-device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) || exit 1 
-clear
-
+read -p 'Device for new installation: ' device
 read -p 'Hostname for new installation: ' myhostname
 read -p 'Username for new installation: ' myusername
 read -p 'Password for new installation: ' mypassword
@@ -100,7 +95,7 @@ echo 'echo "options root=PARTUUID=${mypartuuid} rw" >> /boot/loader/entries/arch
 echo -e "
 
 chmod 777 /root/chrootscr.sh
-/root/chrootscr.sh
+#./root/chrootscr.sh
 #rm /root/chrootscr.sh
 " | arch-chroot /mnt
 
