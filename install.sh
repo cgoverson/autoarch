@@ -83,19 +83,21 @@ echo 'title Arch Linux' > /boot/loader/entries/arch.conf
 echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
 echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
-echo ${myhostname} > /mnt/etc/hostname
+echo ${myhostname} > /etc/hostname
 useradd -m -g wheel -G audio ${myusername}
-echo -e ${mypassword} | passwd ${myusername} --stdin
+echo -e ${mypassword} | passwd ${myusername}
 passwd --lock root
 
 " > /mnt/root/chrootscr.sh
-echo 'mypartuuid=$(blkid -s PARTUUID -o value ${device})' >> /mnt/root/chrootscr.sh
+
+
+echo "mypartuuid=$(blkid -s PARTUUID -o value ${device}3)" >> /mnt/root/chrootscr.sh
 echo 'echo "options root=PARTUUID=${mypartuuid} rw" >> /boot/loader/entries/arch.conf' >> /mnt/root/chrootscr.sh
 
 echo -e "
 
 chmod 777 /root/chrootscr.sh
-#./root/chrootscr.sh
+./root/chrootscr.sh
 #rm /root/chrootscr.sh
 " | arch-chroot /mnt
 
