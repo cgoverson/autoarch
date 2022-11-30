@@ -90,12 +90,10 @@ passwd --lock root
 
 " > /mnt/root/chrootscr.sh
 
-
 echo "mypartuuid=$(blkid -s PARTUUID -o value ${device}3)" >> /mnt/root/chrootscr.sh
 echo 'echo "options root=PARTUUID=${mypartuuid} rw" >> /boot/loader/entries/arch.conf' >> /mnt/root/chrootscr.sh
 
 echo -e "
-
 chmod 777 /root/chrootscr.sh
 ./root/chrootscr.sh
 #rm /root/chrootscr.sh
