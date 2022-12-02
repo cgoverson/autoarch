@@ -85,9 +85,9 @@ echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 echo ${myhostname} > /etc/hostname
 useradd -m -g wheel -G audio ${myusername}
-echo -e ${mypassword} | passwd ${myusername}
+echo -e "${mypassword}\n${mypassword}" | passwd ${myusername}
 passwd --lock root
-
+sudo pacman -Syu --noconfirm wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium xfce4-pulseaudio-plugin
 " > /mnt/root/chrootscr.sh
 
 echo "mypartuuid=$(blkid -s PARTUUID -o value ${device}3)" >> /mnt/root/chrootscr.sh
@@ -100,5 +100,10 @@ chmod 777 /root/chrootscr.sh
 " | arch-chroot /mnt
 
 echo -e "
-# Do some stuff
-" > /mnt/home/${myusername}/firstboot.sh
+systemctl enable NetworkManager.service
+systemctl start NetworkManager.service
+" > /mnt/root/firstbootroot.sh
+
+echo -e "
+xfconf-query -c xfce4-session -p /general/SaveOnExit -s false
+" > /mnt/home/${myusername}/firstbootuser.sh
