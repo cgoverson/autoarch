@@ -30,6 +30,7 @@ totalRam=$(($totalRam+1000000))
 totalDisk=$[ $(cat /sys/block/${device:5}/size) / 2 ]
 offset=$(($totalDisk-$totalRam))
 
+# Use fdisk manually so that it dynamically recognizes how much can be used for root dir after /boot and swap
 echo -e "g
 n
 1
@@ -69,6 +70,10 @@ pacstrap /mnt base linux linux-firmware #base-devel
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
+# Set up temporary file for setting password later
+echo -e "${mypassword}\n${mypassword}" > /mnt/root/temp
+
+# Create a chroot script and call it manually due to quotation & variable call limitations in bash
 echo -e "
 ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 hwclock --systohc
@@ -85,25 +90,30 @@ echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 echo ${myhostname} > /etc/hostname
 useradd -m -g wheel -G audio ${myusername}
-echo -e "${mypassword}\n${mypassword}" | passwd ${myusername}
+cat temp | passwd ${myusername}
 passwd --lock root
 sudo pacman -Syu --noconfirm pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium xfce4-pulseaudio-plugin
+sudo systemctl enable NetworkManager.service
 " > /mnt/root/chrootscr.sh
 
+# Some things need to be added afterwards...
 echo "mypartuuid=$(blkid -s PARTUUID -o value ${device}3)" >> /mnt/root/chrootscr.sh
 echo 'echo "options root=PARTUUID=${mypartuuid} rw" >> /boot/loader/entries/arch.conf' >> /mnt/root/chrootscr.sh
 
+# Run chroot script
 echo -e "
 chmod 777 /root/chrootscr.sh
 ./root/chrootscr.sh
 #rm /root/chrootscr.sh
 " | arch-chroot /mnt
 
-echo -e "
-systemctl enable NetworkManager.service
-systemctl start NetworkManager.service
-" > /mnt/root/firstbootroot.sh
+# Clean up temporary password file
+cat /dev/null > /mnt/root/temp
+rm /mnt/root/temp
 
+# Configure XFCE properly
+
+# Create firstboot script
 echo -e "
 xfconf-query -c xfce4-session -p /general/SaveOnExit -s false
 " > /mnt/home/${myusername}/firstbootuser.sh
