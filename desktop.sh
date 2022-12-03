@@ -87,7 +87,7 @@ echo ${myhostname} > /etc/hostname
 useradd -m -g wheel -G audio ${myusername}
 echo -e "${mypassword}\n${mypassword}" | passwd ${myusername}
 passwd --lock root
-sudo pacman -Syu --noconfirm pipewire-jack pipewire-alsa pipewire-pulseaudio wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium xfce4-pulseaudio-plugin
+sudo pacman -Syu --noconfirm pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium xfce4-pulseaudio-plugin
 " > /mnt/root/chrootscr.sh
 
 echo "mypartuuid=$(blkid -s PARTUUID -o value ${device}3)" >> /mnt/root/chrootscr.sh
