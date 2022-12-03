@@ -65,7 +65,7 @@ chmod 777 temp.sh
 ./temp.sh
 rm temp.sh
 
-pacstrap /mnt base base-devel linux linux-firmware
+pacstrap /mnt base linux linux-firmware #base-devel
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
