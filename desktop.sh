@@ -92,7 +92,7 @@ echo ${myhostname} > /etc/hostname
 useradd -m -g wheel -G audio ${myusername}
 cat temp | passwd ${myusername}
 passwd --lock root
-pacman -Syu --noconfirm pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium xfce4-pulseaudio-plugin
+pacman -Syu --noconfirm sudo pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium xfce4-pulseaudio-plugin
 systemctl enable NetworkManager.service
 " > /mnt/root/chrootscr.sh
 
