@@ -1,5 +1,5 @@
 #!/bin/bash
-
+# TODO: Set up rm for root and user chrooting scripts, create xfce4 config files, and set up xfce4 configs via echoing
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -66,7 +66,7 @@ chmod 777 temp.sh
 ./temp.sh
 rm temp.sh
 
-pacstrap /mnt base linux linux-firmware #base-devel
+pacstrap /mnt base linux linux-firmware base-devel
 
 genfstab -U /mnt >> /mnt/etc/fstab
 
@@ -93,6 +93,7 @@ useradd -m -g wheel -G audio ${myusername}
 cat temp | passwd ${myusername}
 passwd --lock root
 pacman -Syu --noconfirm sudo pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium xfce4-pulseaudio-plugin
+sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 systemctl enable NetworkManager.service
 " > /mnt/root/chrootscr.sh
 
@@ -107,13 +108,30 @@ chmod 777 /root/chrootscr.sh
 #rm /root/chrootscr.sh
 " | arch-chroot /mnt
 
+# Create user chroot script
+echo -e "
+#create various files and set things properly
+" > /mnt/home/${myusername}/chrootscr.sh
+
+# Run user chroot script
+echo -e "
+chmod 777 /home/${myusername}/chrootscr.sh
+cd /home/${myusername}
+su ${myusername}
+./chrootscr.sh
+#rm chrootscr.sh
+exit
+" | arch-chroot /mnt
+
 # Clean up temporary password file
 cat /dev/null > /mnt/root/temp
 rm /mnt/root/temp
-
-# Configure XFCE properly
 
 # Create firstboot script
 echo -e "
 xfconf-query -c xfce4-session -p /general/SaveOnExit -s false
 " > /mnt/home/${myusername}/firstbootuser.sh
+
+# Lastly, Configure XFCE properly
+echo 'WebBrowser=chromium' > /mnt/home/${myusername}/.config/xfce4/helpers.rc
+echo "" > /mnt/home/${myusername}/.config/xfce4/xfconf/xfce-perchannel-xml/test.txt
