@@ -110,7 +110,13 @@ chmod 777 /root/chrootscr.sh
 
 # Create user chroot script
 echo -e "
-#create various files and set things properly
+mkdir ~/.config
+mkdir ~/.config/xfce4
+
+chmod 755 ~/.config
+chmod 755 ~/.config/xfce4
+
+echo 'WebBrowser=chromium' >> /home/${myusername}/.config/xfce4/helpers.rc
 " > /mnt/home/${myusername}/chrootscr.sh
 
 # Run user chroot script
@@ -133,5 +139,4 @@ xfconf-query -c xfce4-session -p /general/SaveOnExit -s false
 " > /mnt/home/${myusername}/firstbootuser.sh
 
 # Lastly, Configure XFCE properly
-echo 'WebBrowser=chromium' > /mnt/home/${myusername}/.config/xfce4/helpers.rc
 echo "" > /mnt/home/${myusername}/.config/xfce4/xfconf/xfce-perchannel-xml/test.txt
