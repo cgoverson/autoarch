@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: Set up rm for root and user chrooting scripts, create xfce4 config files with correct permissions, and set up xfce4 configs via echoing
+# TODO: Set up rm for root and user chrooting scripts, create xfce4 config files with correct permissions
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -108,15 +108,35 @@ chmod 777 /root/chrootscr.sh
 #rm /root/chrootscr.sh
 " | arch-chroot /mnt
 
+# Clean up temporary password file
+cat /dev/null > /mnt/root/temp
+rm /mnt/root/temp
+
 # Create user chroot script
 echo -e "
 mkdir ~/.config
 mkdir ~/.config/xfce4
+mkdir ~/.config/xfce4/panel
+mkdir ~/.config/xfce4/xfconf
+mkdir ~/.config/xfce4/xfconf/xfce-perchannel-xml
 
 chmod 755 ~/.config
 chmod 755 ~/.config/xfce4
+chmod 755 ~/.config/xfce4/panel
+chmod 755 ~/.config/xfce4/xfconf
+chmod 755 ~/.config/xfce4/xfconf/xfce-perchannel-xml
 
 echo 'WebBrowser=chromium' >> /home/${myusername}/.config/xfce4/helpers.rc
+curl https://raw.githubusercontent.com/cgoverson/autoarch/main/desktop/whiskermenu-7.rc >> ~/.config/xfce4/panel/whiskermenu-7.rc
+curl https://raw.githubusercontent.com/cgoverson/autoarch/main/desktop/xfce4-keyboard-shortcuts.xml >> ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+curl https://raw.githubusercontent.com/cgoverson/autoarch/main/desktop/xfce4-panel.xml >> ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
+
+# todo chmod permissions for each file...
+chmod 755 ~/.config/xfce4/helpers.rc
+chmod 755 ~/.config/xfce4/panel/whiskermenu-7.rc
+chmod 755 ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
+chmod 755 ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
+
 " > /mnt/home/${myusername}/chrootscr.sh
 
 # Run user chroot script
@@ -129,14 +149,7 @@ su ${myusername}
 exit
 " | arch-chroot /mnt
 
-# Clean up temporary password file
-cat /dev/null > /mnt/root/temp
-rm /mnt/root/temp
-
 # Create firstboot script
 echo -e "
 xfconf-query -c xfce4-session -p /general/SaveOnExit -s false
 " > /mnt/home/${myusername}/firstbootuser.sh
-
-# Lastly, Configure XFCE properly
-echo "" > /mnt/home/${myusername}/.config/xfce4/xfconf/xfce-perchannel-xml/test.txt
