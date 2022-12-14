@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: Set up rm for root and user chrooting scripts, create xfce4 config files, and set up xfce4 configs via echoing
+# TODO: Set up rm for root and user chrooting scripts, create xfce4 config files with correct permissions, and set up xfce4 configs via echoing
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
