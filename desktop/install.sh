@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: Set up rm for root and user chrooting scripts, create xfce4 config files with correct permissions, add fallback image to boot options
+# TODO: ,, add fallback image to boot options, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -90,9 +90,9 @@ echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 echo ${myhostname} > /etc/hostname
 useradd -m -g wheel -G audio ${myusername}
-cat temp | passwd ${myusername}
+cat /root/temp | passwd ${myusername}
 passwd --lock root
-pacman -Syu --noconfirm sudo pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium xfce4-pulseaudio-plugin
+pacman -Syu --noconfirm sudo xorg-server pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium network-manager-applet xfce4-pulseaudio-plugin
 sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 systemctl enable NetworkManager.service
 " > /mnt/root/chrootscr.sh
@@ -105,7 +105,8 @@ echo 'echo "options root=PARTUUID=${mypartuuid} rw" >> /boot/loader/entries/arch
 echo -e "
 chmod 777 /root/chrootscr.sh
 ./root/chrootscr.sh
-#rm /root/chrootscr.sh
+rm /root/chrootscr.sh
+cat /dev/null > /root/temp
 " | arch-chroot /mnt
 
 # Clean up temporary password file
@@ -144,7 +145,7 @@ chmod 777 /home/${myusername}/chrootscr.sh
 cd /home/${myusername}
 su ${myusername}
 ./chrootscr.sh
-#rm chrootscr.sh
+rm chrootscr.sh
 exit
 " | arch-chroot /mnt
 
