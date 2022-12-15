@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: Set up rm for root and user chrooting scripts, create xfce4 config files with correct permissions
+# TODO: Set up rm for root and user chrooting scripts, create xfce4 config files with correct permissions, add fallback image to boot options
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -131,7 +131,6 @@ curl https://raw.githubusercontent.com/cgoverson/autoarch/main/desktop/whiskerme
 curl https://raw.githubusercontent.com/cgoverson/autoarch/main/desktop/xfce4-keyboard-shortcuts.xml >> ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
 curl https://raw.githubusercontent.com/cgoverson/autoarch/main/desktop/xfce4-panel.xml >> ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
 
-# todo chmod permissions for each file...
 chmod 644 ~/.config/xfce4/helpers.rc
 chmod 644 ~/.config/xfce4/panel/whiskermenu-7.rc
 chmod 644 ~/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-keyboard-shortcuts.xml
