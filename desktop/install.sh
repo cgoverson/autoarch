@@ -92,7 +92,7 @@ echo ${myhostname} > /etc/hostname
 useradd -m -g wheel -G audio ${myusername}
 cat /root/temp | passwd ${myusername}
 passwd --lock root
-pacman -Syu --noconfirm sudo xorg-server pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium network-manager-applet xfce4-pulseaudio-plugin
+pacman -Syu --noconfirm sudo xorg-server pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium network-manager-applet xfce4-pulseaudio-plugin xfce4-screensaver xfce4-session
 sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 systemctl enable NetworkManager.service
 " > /mnt/root/chrootscr.sh
