@@ -55,7 +55,7 @@ t
 w" | fdisk $device
 
 # For some reason mkfs doesn't like using variable names for devices, so temp.sh is created
-echo "mkfs.fat -F 32 ${device}1" > temp.sh
+echo "mkfs.fat -F 16 ${device}1" > temp.sh
 echo "mkswap ${device}2" >> temp.sh
 echo "mkfs.ext4 ${device}3" >> temp.sh
 echo "mount ${device}3 /mnt" >> temp.sh
