@@ -1,5 +1,4 @@
 favorites=xfce-settings-manager.desktop,xfce4-file-manager.desktop,xfce4-terminal-emulator.desktop,org.inkscape.Inkscape.desktop,chromium.desktop,audacity.desktop,vncviewer.desktop
-recent=xfce4-terminal-emulator.desktop,pavucontrol.desktop,xfce-display-settings.desktop,xfce-settings-manager.desktop,xfce4-file-manager.desktop,vncviewer.desktop,xfce-ui-settings.desktop,org.inkscape.Inkscape.desktop,blueman-manager.desktop,xfce4-mime-settings.desktop
 button-icon=archlinux-logo
 button-single-row=false
 show-button-title=false
@@ -46,43 +45,4 @@ command-logout=xfce4-session-logout
 show-command-logout=false
 command-menueditor=menulibre
 show-command-menueditor=true
-command-profile=mugshot
 show-command-profile=false
-search-actions=6
-
-[action0]
-name=Man Pages
-pattern=#
-command=exo-open --launch TerminalEmulator man %s
-regex=false
-
-[action1]
-name=Search the Web
-pattern=?
-command=exo-open --launch WebBrowser https://duckduckgo.com/?q=%u
-regex=false
-
-[action2]
-name=Search for Files
-pattern=-
-command=catfish --path=~ --start %s
-regex=false
-
-[action3]
-name=Wikipedia
-pattern=!w
-command=exo-open --launch WebBrowser https://en.wikipedia.org/wiki/%u
-regex=false
-
-[action4]
-name=Run in Terminal
-pattern=!
-command=exo-open --launch TerminalEmulator %s
-regex=false
-
-[action5]
-name=Open URI
-pattern=^(file|http|https):\\/\\/(.*)$
-command=exo-open \\0
-regex=true
-
