@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: ,*GOTO LINE 105* rewrite non-efi condition to use gpt/bios install-- see https://wiki.archlinux.org/title/Partitioning#BIOS/GPT_layout_example , add fallback image to boot options for BIOS and UEFI, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?
+# TODO: ,*GOTO LINE 105* rewrite non-efi condition to use gpt/bios install-- see https://wiki.archlinux.org/title/Partitioning#BIOS/GPT_layout_example , add fallback image to boot options for BIOS and UEFI, pacman hooks (for syslinux/systemd-boot?), clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -149,6 +149,8 @@ echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
 echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 " >> /mnt/root/chrootscr.sh
+  echo "mypartuuid=$(blkid -s PARTUUID -o value ${device}3)" >> /mnt/root/chrootscr.sh
+  echo 'echo "options root=PARTUUID=${mypartuuid} rw" >> /boot/loader/entries/arch.conf' >> /mnt/root/chrootscr.sh
 else
   echo -e "
 pacman -Syu --noconfirm syslinux
@@ -165,10 +167,6 @@ pacman -Syu --noconfirm gvfs xorg-server pipewire-jack pipewire-alsa pipewire-pu
 sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 systemctl enable NetworkManager.service
 " >> /mnt/root/chrootscr.sh
-
-# Some things need to be added afterwards...
-echo "mypartuuid=$(blkid -s PARTUUID -o value ${device}3)" >> /mnt/root/chrootscr.sh
-echo 'echo "options root=PARTUUID=${mypartuuid} rw" >> /boot/loader/entries/arch.conf' >> /mnt/root/chrootscr.sh
 
 # Run chroot script
 echo -e "
