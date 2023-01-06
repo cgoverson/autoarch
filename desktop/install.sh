@@ -17,7 +17,8 @@ echo 'Server = https://mirror.umd.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d
 echo 'Server = https://mirrors.mit.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
 echo 'Server = https://mirrors.bloomu.edu/archlinux/$repo/os/$arch' >> /etc/pacman.d/mirrorlist
 
-pacman-keyring --init
+pacman-key --init
+pacman-key --populate archlinux
 pacman -Syy
 pacman --noconfirm -S archlinux-keyring
 pacman --noconfirm -S dialog
