@@ -33,8 +33,14 @@ myhostname=$(dialog --stdout --inputbox "Enter name for this computer" 0 0) || e
 : ${myhostname:?"hostname cannot be empty"}
 myusername=$(dialog --stdout --inputbox "Enter username" 0 0) || exit 1
 : ${myusername:?"username cannot be empty"}
-mypassword=$(dialog --stdout --passwordbox "Enter password" 0 0) || exit 1
-: ${mypassword:?"password cannot be empty"}
+
+echo -n "Password for ${myusername}: "
+read -s mypassword
+echo
+echo -n "Repeat Password: "
+read -s mypassword2
+echo
+[[ "$mypassword" == "$mypassword2" ]] || ( echo "Passwords did not match"; exit 1; )
 
 # Detect efi mode
 if [ -d "/sys/firmware/efi/efivars" ]; then
