@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: ,*GOTO LINE 105* rewrite non-efi condition to use gpt/bios install-- see https://wiki.archlinux.org/title/Partitioning#BIOS/GPT_layout_example , add fallback image to boot options, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?
+# TODO: ,*GOTO LINE 105* rewrite non-efi condition to use gpt/bios install-- see https://wiki.archlinux.org/title/Partitioning#BIOS/GPT_layout_example , add fallback image to boot options for BIOS and UEFI, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -117,7 +117,11 @@ ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 hwclock --systohc
 echo -e 'en_US.UTF-8 UTF-8' > /etc/locale.gen
 locale-gen
-pacman -Syu --noconfirm intel-ucode networkmanager python nano 
+pacman -Syu --noconfirm intel-ucode networkmanager python nano
+" > /mnt/root/chrootscr.sh
+
+if ["$efiDetect" = 1]; then
+  echo -e "
 bootctl install
 echo 'default arch.conf' > /boot/loader/loader.conf
 echo 'editor  no' >> /boot/loader/loader.conf
@@ -126,6 +130,15 @@ echo 'title Arch Linux' > /boot/loader/entries/arch.conf
 echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
 echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
+" >> /mnt/root/chrootscr.sh
+else
+  echo -e "
+pacman -Syu --noconfirm syslinux
+syslinux-install_update -i -a -m
+" >> /mnt/root/chrootscr.sh
+fi
+
+echo -e "
 echo ${myhostname} > /etc/hostname
 useradd -m -g wheel -G audio ${myusername}
 cat /root/temp | passwd ${myusername}
@@ -133,7 +146,7 @@ passwd --lock root
 pacman -Syu --noconfirm gvfs xorg-server pipewire-jack pipewire-alsa pipewire-pulse wireplumber pipewire xf86-video-intel mesa xfce4 xfce4-whiskermenu-plugin ttf-dejavu chromium network-manager-applet xfce4-pulseaudio-plugin xfce4-screensaver xfce4-session
 sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 systemctl enable NetworkManager.service
-" > /mnt/root/chrootscr.sh
+" >> /mnt/root/chrootscr.sh
 
 # Some things need to be added afterwards...
 echo "mypartuuid=$(blkid -s PARTUUID -o value ${device}3)" >> /mnt/root/chrootscr.sh
