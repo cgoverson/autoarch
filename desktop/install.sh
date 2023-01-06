@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: , add fallback image to boot options for  UEFI, pacman hooks (for syslinux/systemd-boot?),clean up ui choices, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?,check for standard errors?, delete temp.sh chrootscripts for user and root and clean up password file
+# TODO: ,configure trim,clean up ui choices, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?,check for standard errors?, delete temp.sh chrootscripts for user and root and clean up password file
 # Moularization todo: |Primary install pacstrap script| > |Bootloader install chroot & then bootloader config non-chroot| > |UI & networking setup| > |User firstboot messages and scripts|
 
 script
@@ -152,6 +152,19 @@ echo 'title Arch Linux' > /boot/loader/entries/arch.conf
 echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
 echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
+echo 'title Arch Linux Fallback' > /boot/loader/entries/arch-fallback.conf
+echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch-fallback.conf
+echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch-fallback.conf
+echo 'initrd /initramfs-linux-fallback.img' >> /boot/loader/entries/arch-fallback.conf
+echo '[Trigger]' > /etc/pacman.d/hooks/95-systemd-boot.hook
+echo 'Type = Package' >> /etc/pacman.d/hooks/95-systemd-boot.hook
+echo 'Operation = Upgrade' >> /etc/pacman.d/hooks/95-systemd-boot.hook
+echo 'Target = systemd' >> /etc/pacman.d/hooks/95-systemd-boot.hook
+echo '' >> /etc/pacman.d/hooks/95-systemd-boot.hook
+echo '[Action]' >> /etc/pacman.d/hooks/95-systemd-boot.hook
+echo 'Description = Gracefully upgrading systemd-boot...' >> /etc/pacman.d/hooks/95-systemd-boot.hook
+echo 'When = PostTransaction' >> /etc/pacman.d/hooks/95-systemd-boot.hook
+echo 'Exec = /usr/bin/bootctl update' >> /etc/pacman.d/hooks/95-systemd-boot.hook
 " >> /mnt/root/chrootscr.sh
 else
   echo -e "
@@ -184,6 +197,7 @@ chmod 777 /root/chrootscr.sh
 if ["$efiDetect" = 1]; then
   mypartuuid=$(blkid -s PARTUUID -o value ${device}3)
   echo "options root=PARTUUID=${mypartuuid} rw resume=${device}2" >> /mnt/boot/loader/entries/arch.conf
+  echo "options root=PARTUUID=${mypartuuid} rw" >> /mnt/boot/loader/entries/arch-fallback.conf
 else
   sed -i "s|APPEND root=/dev/sda3 rw|APPEND root=${device}2 rw resume=${device}1|g" /mnt/boot/syslinux/syslinux.cfg
 fi
