@@ -23,10 +23,18 @@ pacman --noconfirm -S dialog
 
 lsblk -dplnx size -o name,size
 
-read -p 'Device for new installation: ' device
-read -p 'Hostname for new installation: ' myhostname
-read -p 'Username for new installation: ' myusername
-read -p 'Password for new installation: ' mypassword
+# Old way of getting info:
+#read -p 'Device for new installation: ' device
+# New way of getting info:
+devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
+device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) || exit 1
+
+myhostname=$(dialog --stdout --inputbox "Enter name for this computer" 0 0) || exit 1
+: ${myhostname:?"hostname cannot be empty"}
+myusername=$(dialog --stdout --inputbox "Enter username" 0 0) || exit 1
+: ${myusername:?"username cannot be empty"}
+mypassword=$(dialog --stdout --passwordbox "Enter password" 0 0) || exit 1
+: ${mypassword:?"password cannot be empty"}
 
 # Detect efi mode
 if [ -d "/sys/firmware/efi/efivars" ]; then
