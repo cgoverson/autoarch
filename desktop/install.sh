@@ -1,10 +1,8 @@
 #!/bin/bash
-# TODO: ,configure /boot/syslinux/syslinux.cfg https://gist.github.com/jaymutuku/cb8d0f9734a99c19c2503d8439f79e71, add fallback image to boot options for BIOS and UEFI, pacman hooks (for syslinux/systemd-boot?),clean up ui choices, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?,check for standard errors?, delete temp.sh chrootscripts for user and root and clean up password file
-# Set up logging
-set -uo pipefail
-trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
-exec 1> >(tee "stdout.log") 
-exec 2> >(tee "stderr.log")
+# TODO: , add fallback image to boot options for  UEFI, pacman hooks (for syslinux/systemd-boot?),clean up ui choices, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?,check for standard errors?, delete temp.sh chrootscripts for user and root and clean up password file
+# Moularization todo: |Primary install pacstrap script| > |Bootloader install chroot & then bootloader config non-chroot| > |UI & networking setup| > |User firstboot messages and scripts|
+
+script
 
 timedatectl set-ntp true
 
@@ -36,13 +34,18 @@ myhostname=$(dialog --stdout --inputbox "Enter name for this computer" 0 0) || e
 myusername=$(dialog --stdout --inputbox "Enter username" 0 0) || exit 1
 : ${myusername:?"username cannot be empty"}
 
-echo -n "Password for ${myusername}: "
-read -s mypassword
-echo
-echo -n "Repeat Password: "
-read -s mypassword2
-echo
-[[ "$mypassword" == "$mypassword2" ]] || ( echo "Passwords did not match"; exit 1; )
+mypassword=ab
+mypassword2=cd
+while [ "$mypassword" != "$mypassword2" ]
+do
+  echo -n "Password for ${myusername}: "
+  read -s mypassword
+  echo
+  echo -n "Repeat Password: "
+  read -s mypassword2
+  echo
+  [[ "$mypassword" == "$mypassword2" ]] || ( echo "Passwords did not match. Please retype"; )
+done
 
 # Detect efi mode
 if [ -d "/sys/firmware/efi/efivars" ]; then
@@ -150,16 +153,11 @@ echo 'linux /vmlinuz-linux' >> /boot/loader/entries/arch.conf
 echo 'initrd /intel-ucode.img' >> /boot/loader/entries/arch.conf
 echo 'initrd /initramfs-linux.img' >> /boot/loader/entries/arch.conf
 " >> /mnt/root/chrootscr.sh
-  echo "mypartuuid=$(blkid -s PARTUUID -o value ${device}3)" >> /mnt/root/chrootscr.sh
-  echo 'echo "options root=PARTUUID=${mypartuuid} rw" >> /boot/loader/entries/arch.conf' >> /mnt/root/chrootscr.sh
 else
   echo -e "
 pacman -Syu --noconfirm syslinux
 syslinux-install_update -i -a -m
 sed -i 's/TIMEOUT 50/TIMEOUT 15/g' /boot/syslinux/syslinux.cfg
-
-sed -i 's|APPEND root=/dev/sda3 rw|APPEND root=/dev/sda2 rw resume=/dev/sda1|g' /boot/syslinux/syslinux.cfg
-
 sed -i 's|INITRD ../initramfs-linux.img|INITRD ../intel-ucode.img,../initramfs-linux.img|g' /boot/syslinux/syslinux.cfg
 sed -i 's|INITRD ../initramfs-linux-fallback.img|INITRD ../intel-ucode.img,../initramfs-linux-fallback.img|g' /boot/syslinux/syslinux.cfg
 " >> /mnt/root/chrootscr.sh
@@ -182,6 +180,14 @@ chmod 777 /root/chrootscr.sh
 #rm /root/chrootscr.sh
 #cat /dev/null > /root/temp
 " | arch-chroot /mnt
+
+if ["$efiDetect" = 1]; then
+  mypartuuid=$(blkid -s PARTUUID -o value ${device}3)
+  echo "options root=PARTUUID=${mypartuuid} rw resume=${device}2" >> /mnt/boot/loader/entries/arch.conf
+else
+  sed -i "s|APPEND root=/dev/sda3 rw|APPEND root=${device}2 rw resume=${device}1|g" /mnt/boot/syslinux/syslinux.cfg
+fi
+
 
 # Clean up temporary password file
 #cat /dev/null > /mnt/root/temp
@@ -227,3 +233,5 @@ exit
 echo -e "
 xfconf-query -c xfce4-session -p /general/SaveOnExit -s false
 " > /mnt/home/${myusername}/firstbootuser.sh
+
+exit
