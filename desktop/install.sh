@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: ,*GOTO LINE 105* rewrite non-efi condition to use gpt/bios install-- see https://wiki.archlinux.org/title/Partitioning#BIOS/GPT_layout_example , add fallback image to boot options for BIOS and UEFI, pacman hooks (for syslinux/systemd-boot?), clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?
+# TODO: ,*GOTO LINE 105* rewrite non-efi condition to use gpt/bios install-- see https://wiki.archlinux.org/title/Partitioning#BIOS/GPT_layout_example , add fallback image to boot options for BIOS and UEFI, pacman hooks (for syslinux/systemd-boot?), clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?, delete temp.sh chrootscripts for user and root and clean up password file
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
@@ -52,8 +52,6 @@ fi
 # Calculate partition table
 totalRam=$(grep MemTotal /proc/meminfo | sed 's/[^0-9]*//g')
 totalRam=$(($totalRam+1000000))
-totalDisk=$[ $(cat /sys/block/${device:5}/size) / 2 ]
-offset=$(($totalDisk-$totalRam))
 
 # Use fdisk manually so that it dynamically recognizes how much can be used for root dir after /boot and swap
 if ["$efiDetect" = 1]; then
@@ -90,7 +88,7 @@ w" | fdisk $device
   echo "swapon ${device}2" >> temp.sh
   chmod 777 temp.sh
   ./temp.sh
-  rm temp.sh
+  #rm temp.sh
 else
   echo -e "o
 n
@@ -119,7 +117,7 @@ w" | fdisk $device
   echo "swapon ${device}1" >> temp.sh
   chmod 777 temp.sh
   ./temp.sh
-  rm temp.sh
+  #rm temp.sh
 fi
 
 pacstrap /mnt base linux linux-firmware base-devel
@@ -172,13 +170,13 @@ systemctl enable NetworkManager.service
 echo -e "
 chmod 777 /root/chrootscr.sh
 ./root/chrootscr.sh
-rm /root/chrootscr.sh
-cat /dev/null > /root/temp
+#rm /root/chrootscr.sh
+#cat /dev/null > /root/temp
 " | arch-chroot /mnt
 
 # Clean up temporary password file
-cat /dev/null > /mnt/root/temp
-rm /mnt/root/temp
+#cat /dev/null > /mnt/root/temp
+#rm /mnt/root/temp
 
 # Create user chroot script
 echo -e "
@@ -212,7 +210,7 @@ chmod 777 /home/${myusername}/chrootscr.sh
 cd /home/${myusername}
 su ${myusername}
 ./chrootscr.sh
-rm chrootscr.sh
+#rm chrootscr.sh
 exit
 " | arch-chroot /mnt
 
