@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: ,make sure bios partitioning is set up correctly, add fallback image to boot options for BIOS and UEFI, pacman hooks (for syslinux/systemd-boot?), clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?, delete temp.sh chrootscripts for user and root and clean up password file
+# TODO: ,configure /boot/syslinux/syslinux.cfg https://gist.github.com/jaymutuku/cb8d0f9734a99c19c2503d8439f79e71, add fallback image to boot options for BIOS and UEFI, pacman hooks (for syslinux/systemd-boot?),clean up ui choices, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?,check for standard errors?, delete temp.sh chrootscripts for user and root and clean up password file
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
