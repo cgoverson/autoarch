@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: ,*GOTO LINE 105* rewrite non-efi condition to use gpt/bios install-- see https://wiki.archlinux.org/title/Partitioning#BIOS/GPT_layout_example , add fallback image to boot options for BIOS and UEFI, pacman hooks (for syslinux/systemd-boot?), clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?, delete temp.sh chrootscripts for user and root and clean up password file
+# TODO: ,make sure bios partitioning is set up correctly, add fallback image to boot options for BIOS and UEFI, pacman hooks (for syslinux/systemd-boot?), clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?, delete temp.sh chrootscripts for user and root and clean up password file
 # Set up logging
 set -uo pipefail
 trap 's=$?; echo "$0: Error on line "$LINENO": $BASH_COMMAND"; exit $s' ERR
