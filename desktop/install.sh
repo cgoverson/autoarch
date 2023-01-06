@@ -135,6 +135,7 @@ ln -sf /usr/share/zoneinfo/America/New_York /etc/localtime
 hwclock --systohc
 echo -e 'en_US.UTF-8 UTF-8' > /etc/locale.gen
 locale-gen
+sed -i 's/udev/udev resume/g' /etc/mkinitcpio.conf
 pacman -Syu --noconfirm intel-ucode networkmanager python nano
 " > /mnt/root/chrootscr.sh
 
@@ -155,6 +156,12 @@ else
   echo -e "
 pacman -Syu --noconfirm syslinux
 syslinux-install_update -i -a -m
+sed -i 's/TIMEOUT 50/TIMEOUT 15/g' /boot/syslinux/syslinux.cfg
+
+sed -i 's|APPEND root=/dev/sda3 rw|APPEND root=/dev/sda2 rw resume=/dev/sda1|g' /boot/syslinux/syslinux.cfg
+
+sed -i 's|INITRD ../initramfs-linux.img|INITRD ../intel-ucode.img,../initramfs-linux.img|g' /boot/syslinux/syslinux.cfg
+sed -i 's|INITRD ../initramfs-linux-fallback.img|INITRD ../intel-ucode.img,../initramfs-linux-fallback.img|g' /boot/syslinux/syslinux.cfg
 " >> /mnt/root/chrootscr.sh
 fi
 
