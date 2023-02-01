@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: switch from systemdboot to clean efi,clean up ui choices, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?,check for standard errors?, delete temp.sh chrootscripts for user and root and clean up password file
+# TODO:,fix password behavior, switch from systemdboot to clean efi,clean up ui choices, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?,check for standard errors?, delete temp.sh chrootscripts for user and root and clean up password file
 # Moularization todo: |Primary install pacstrap script| > |Bootloader install chroot & then bootloader config non-chroot| > |UI & networking setup| > |User firstboot messages and scripts|
 
 timedatectl set-ntp true
