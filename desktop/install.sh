@@ -1,5 +1,5 @@
 #!/bin/bash
-# TODO: ,configure trim,clean up ui choices, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?,check for standard errors?, delete temp.sh chrootscripts for user and root and clean up password file
+# TODO: switch from systemdboot to clean efi,clean up ui choices, clean up existing xfce config files, set up clean firstboot / startxfce4 / xinit/bashprofile behavior?,check for standard errors?, delete temp.sh chrootscripts for user and root and clean up password file
 # Moularization todo: |Primary install pacstrap script| > |Bootloader install chroot & then bootloader config non-chroot| > |UI & networking setup| > |User firstboot messages and scripts|
 
 script
@@ -28,6 +28,8 @@ lsblk -dplnx size -o name,size
 # New way of getting info:
 devicelist=$(lsblk -dplnx size -o name,size | grep -Ev "boot|rpmb|loop" | tac)
 device=$(dialog --stdout --menu "Select installation disk" 0 0 0 ${devicelist}) || exit 1
+
+useTrim=$(hdparm -I /dev/${device} | grep TRIM)
 
 myhostname=$(dialog --stdout --inputbox "Enter name for this computer" 0 0) || exit 1
 : ${myhostname:?"hostname cannot be empty"}
@@ -185,6 +187,12 @@ pacman -Syu --noconfirm gvfs xorg-server pipewire-jack pipewire-alsa pipewire-pu
 sed -i 's/# %wheel ALL=(ALL:ALL) ALL/%wheel ALL=(ALL:ALL) ALL/g' /etc/sudoers
 systemctl enable NetworkManager.service
 " >> /mnt/root/chrootscr.sh
+
+if [[ $useTrim == *"TRIM supported"* ]]; then
+  echo -e "
+systemctl enable fstrim.timer
+" >> /mnt/root/chrootscr.sh
+fi
 
 # Run chroot script
 echo -e "
